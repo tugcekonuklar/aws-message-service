@@ -4,7 +4,6 @@ import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 
 import java.util.List;
-import java.util.UUID;
 
 public class SnsPublisher {
 
@@ -25,7 +24,7 @@ public class SnsPublisher {
         final var messages = List.of("Hello Medium!", "Message with Love");
         messages.stream()
                 .forEach(message ->
-                        snsClient.publish(TOPIC_ARN_MESSAGE, String.format("{ \"messageId\": \"%s\" , \"message\": \"%s\"}", UUID.randomUUID(), message)));
+                        snsClient.publish(TOPIC_ARN_MESSAGE, String.format("{\"message\": \"%s\"}", message)));
 
     }
 }
