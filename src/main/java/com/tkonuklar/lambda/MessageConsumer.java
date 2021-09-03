@@ -9,34 +9,25 @@ import com.amazonaws.services.lambda.runtime.events.SQSEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class MessageConsumer implements RequestHandler<SQSEvent, String> {
+
+    private ObjectMapper objMapper;
+
     @Override
     public String handleRequest(SQSEvent event, Context context) {
         context.getLogger().log("Initiating Message Consumer Function");
-        ObjectMapper objMapper = new ObjectMapper();
+        objMapper = new ObjectMapper();
         try {
+            AmazonDynamoDB dynamoDB = AmazonDynamoDBClientBuilder.standard().build();
+            DynamoDBMapper mapper = new DynamoDBMapper(dynamoDB);
             for (SQSEvent.SQSMessage msg : event.getRecords()) {
-                System.out.println(msg.getBody());
                 context.getLogger().log("Message received: " + msg.getBody());
-                AmazonDynamoDB dynamoDB = AmazonDynamoDBClientBuilder.standard().build();
-                DynamoDBMapper mapper = new DynamoDBMapper(dynamoDB);
                 Message message = objMapper.readValue(msg.getBody(), Message.class);
-                message.setMessageId(null);
                 mapper.save(message);
-                context.getLogger().log("Message saved successfully: " + message);
+                context.getLogger().log("Message was saved successfully: " + message);
             }
         } catch (Exception ex) {
             context.getLogger().log("FAILED! : " + ex.getMessage());
         }
         return event.toString();
-//        AmazonDynamoDB dynamoDB = AmazonDynamoDBClientBuilder.standard().build();
-//        DynamoDBMapper mapper = new DynamoDBMapper(dynamoDB);
-//        for (SQSEvent.SQSMessage msg : event.getRecords()) {
-//            Message message = new Message();
-//            message.setMessage(msg.getBody());
-//            context.getLogger().log("Message received: {" + message.toString() + "}");
-//            mapper.save(message);
-//        }
-//        context.getLogger().log("Returning messageID: \"" + message.getMessageId() + "\"");
-//        return message.getMessageId();
     }
 }

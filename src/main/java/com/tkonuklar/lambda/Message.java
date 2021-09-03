@@ -30,6 +30,6 @@ public class Message {
     }
 
     public String toString() {
-        return new String("messageId: \"" + this.messageId + "\", message: \"" + this.message + "\"");
+        return String.format("messageId: %s, message: %s", messageId, message);
     }
 }
